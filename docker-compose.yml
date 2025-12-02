@@ -1,0 +1,48 @@
+# Meeting Scheduler Docker Compose Configuration
+# For easy local development and deployment
+# Requirement: 8.5
+
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: meeting-scheduler
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      # Mount database directory for persistence
+      # Requirement: 8.5 - Volume mounting for database persistence
+      - meeting-data:/data
+      # Mount code for development (optional, comment out for production)
+      - .:/app
+    environment:
+      # Environment variable configuration
+      # Requirement: 8.5 - Environment variable configuration
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-secret-key-change-in-production}
+      - DJANGO_DEBUG=${DJANGO_DEBUG:-True}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-*}
+      - DATABASE_PATH=${DATABASE_PATH:-/data/db.sqlite3}
+      - PORT=${PORT:-8000}
+    healthcheck:
+      # Health check for service availability
+      # Requirement: 8.5 - Health check for service availability
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/meetings/').read()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - meeting-network
+
+volumes:
+  # Named volume for database persistence
+  meeting-data:
+    driver: local
+
+networks:
+  meeting-network:
+    driver: bridge

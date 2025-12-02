@@ -1,0 +1,21 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+media
+staticfiles
+.env
+venv/
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Agent and Kiro
+.agent/
+.kiro/
+kiro*
